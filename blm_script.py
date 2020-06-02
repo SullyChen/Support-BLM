@@ -10,12 +10,14 @@ def wait(wait_time):
         pass
 
 max_results = 30 #number of random BLM videos to query from YouTube
-results = YoutubeSearch('black lives matter', max_results=max_results).to_dict() #query YouTube for videos
+results = YoutubeSearch('black lives matter -fox', max_results=max_results).to_dict() #query YouTube for videos, exclude Fox news
 
 #generate array of youtube links
 links = []
 for l in results:
     links.append("https://youtube.com" + l["link"])
+
+print(links)
 
 #main loop
 while True:
