@@ -1,13 +1,14 @@
-import webbrowser
 import random
 from youtube_search import YoutubeSearch
 import time
 import pafy
+from selenium import webdriver
+dr = webdriver.Chrome()
 
 def main():
     while True:
-        webbrowser.open("https://youtu.be/bCgLa25fDHM", new=1) #open main BLM-ad video in new window
-        time.sleep(3386); #wait until main video finishes
+        dr.get("https://youtu.be/bCgLa25fDHM") #open main BLM-ad video in new window
+        time.sleep(3386) #wait until main video finishes
 
         #generate new array of youtube links
         print("Querying new video links")
@@ -27,7 +28,7 @@ def main():
                 video = pafy.new(links[idx]) #Creating pafy object
                 if video.length < 600: #only pick videos under 10 minutes to save time
                     print("Opening new video: " + links[idx])
-                    webbrowser.open_new_tab(links[idx]) #open a random blm video
+                    dr.get(links[idx]) #open a random blm video
                     print("Waiting " + str(video.length) + " seconds...")
                     time.sleep(video.length) #wait a minute to open the next one
                     idx += 1
