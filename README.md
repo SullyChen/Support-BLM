@@ -7,7 +7,7 @@ Recently a [video](https://youtu.be/bCgLa25fDHM) was released intending to raise
 This script implements the "5/+/r/3/a/m" method of YouTube randomization to maximize ad revenue.
 
 # Requirements
-For windows, the only requirement is Google Chrome v83. For Mac/Linux, see below.
+For Windows, the only requirement is Google Chrome v83. For Mac/Linux, see below.
 
 # How to use on Windows
 For Windows users, download and unzip the blm_windows_exe.zip file, then run "blm_script.exe" and that's it! HUGE shoutout to [Brent Vollebregt](https://github.com/brentvollebregt/auto-py-to-exe), who made the code to turn any .py file into a Windows executable. Incredible work which allowed this project to be easier to use on Windows! Please turn off YouTube autoplay, and ensure that your machine is not set to go to sleep after a certain period of time (this will stop the videos from playing).
