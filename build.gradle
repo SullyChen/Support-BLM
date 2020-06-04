@@ -24,7 +24,9 @@ repositories {
 }
 
 dependencies {
+    compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
     compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
+    compile 'org.jsoup:jsoup:1.13.1'
 }
 
 shadowJar {
