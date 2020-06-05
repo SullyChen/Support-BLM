@@ -9,14 +9,11 @@ This script implements the "5/+/r/3/a/m" method of YouTube randomization to maxi
 # Requirements
 For Windows, the only requirement is Google Chrome v83. For Mac/Linux, see below.
 
-# How to use on Windows
-For Windows users, download and unzip the blm_windows_exe.zip file, then run "blm_script.exe" and that's it! HUGE shoutout to [Brent Vollebregt](https://github.com/brentvollebregt/auto-py-to-exe), who made the code to turn any .py file into a Windows executable. Incredible work which allowed this project to be easier to use on Windows! Please turn off YouTube autoplay, and ensure that your machine is not set to go to sleep after a certain period of time (this will stop the videos from playing).
-
-# For Mac/Linux
-There are two options for Mac/Linux execution. The first option is a Python version, and the second is a Java version.
+# Where to find the release
+If you're not interested in the code and just want to download the app, follow this [link](https://github.com/SullyChen/Support-BLM/releases) and download the latest release!
 
 # Python
-Unfortunately, I haven't yet been able to make a Mac or Linux executable file. To run this, [download Python](https://www.python.org/downloads/), then in a [terminal](https://www.youtube.com/watch?v=QROX039ckO8), type `pip install youtube-search pafy youtube_dl selenium`. You will also need Google Chrome v83, as well as the associated [ChromeDriver](https://chromedriver.chromium.org/) for your OS. Finally, you can run the `blm_script.py` which is included in this repository. Please turn off YouTube autoplay, and ensure that your machine is not set to go to sleep after a certain period of time (this will stop the videos from playing).
+Requirements: `pip install youtube-search pafy youtube_dl selenium`. You will also need Google Chrome v83, as well as the associated [ChromeDriver](https://chromedriver.chromium.org/) for your OS. Finally, you can run the `blm_script.py` which is included in this repository.
 
 # Java
 To install the Java version on any platform, open a terminal, set the working directory to Support-BLM/Java, and run the following command: `./gradlew :shadowJar`. To run the compiled application, use the following command: `java -jar build/libs/Support-BLM-all.jar`. Big thanks to David Hacker for porting the Python code to Java and writing all of the Gradle code!
