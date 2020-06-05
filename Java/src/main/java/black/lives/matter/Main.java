@@ -52,6 +52,7 @@ public class Main {
         WebDriver driver = new ChromeDriver(options);
         Random random = new Random();
         WebElement body;
+        boolean spacePressed = false;
         try {
             while (true) {
                 // Open main video using Selenium
@@ -62,7 +63,10 @@ public class Main {
                 // Press 'space' to start the main video and wait for it to finish
                 LOGGER.info("Playing main video for " + MAIN_SECONDS + " seconds.");
                 body = driver.findElement(By.tagName("body"));
-                body.sendKeys(Keys.SPACE);
+                if (!spacePressed) {
+                    body.sendKeys(Keys.SPACE);
+                    spacePressed = true;
+                }
                 waitFor(MAIN_SECONDS);
 
                 // Select a random query from a list of possiblities
@@ -101,7 +105,6 @@ public class Main {
                     driver.get(links.get(j));
                     waitFor(PAGE_LOAD_DELAY);
                     body = driver.findElement(By.tagName("body"));
-                    body.sendKeys(Keys.SPACE);
                     waitFor(linkDurations.get(j));
                 }
             }
