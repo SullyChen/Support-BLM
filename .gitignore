@@ -71,13 +71,16 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 # User-added
-build
-bin
-.idea
-.gradle
-.classpath
-.project
-.settings
+Java/build/*
+!Java/build/libs
+Java/build/libs/*
+!Java/build/libs/blm_youtube.jar
+Java/bin
+Java/.idea
+Java/.gradle
+Java/.classpath
+Java/.project
+Java/.settings
 
 # Compiled class file
 *.class
@@ -93,6 +96,7 @@ bin
 
 # Package Files #
 *.jar
+!blm_youtube.jar
 *.war
 *.nar
 *.ear
