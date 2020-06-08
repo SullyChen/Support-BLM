@@ -4,6 +4,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.jsoup.Jsoup;
@@ -16,6 +17,23 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+class LockWrapper implements AutoCloseable {
+    private final Lock _lock;
+    public LockWrapper(Lock l) {
+        this._lock = l;
+    }
+
+    public void lock() {
+        this._lock.lock();
+    }
+
+    public void close() {
+        this._lock.unlock();
+    }
+}
 
 public class Main {
     private static final String[] POSSIBLE_QUERIES = {
@@ -29,6 +47,7 @@ public class Main {
     private static final int MAIN_SECONDS = 3386;
     private static final int MAX_SECONDARY_MINUTES = 10;
     private static final int PAGE_LOAD_DELAY = 2;
+    private static final int CHECK_SECONDS = 5;
 
     private final static Logger LOGGER;
 
@@ -50,22 +69,49 @@ public class Main {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--mute-audio");
         WebDriver driver = new ChromeDriver(options);
+        Lock driverLock = new ReentrantLock();
         Random random = new Random();
         WebElement body;
         boolean spacePressed = false;
+
+        // The watcher daemon thread monitors the health of the Selenium driver
+        Thread watcher = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try (LockWrapper wrapper = new LockWrapper(driverLock)) {
+                        wrapper.lock();
+                        driver.getCurrentUrl();
+                    } catch (WebDriverException ex) {
+                        LOGGER.warning("Unable to contact browser, so quitting application.");
+                        System.exit(0);
+                    }
+                    waitFor(CHECK_SECONDS);
+                }
+            }
+        });
+        watcher.setDaemon(true);
+        watcher.start();
+
         try {
             while (true) {
                 // Open main video using Selenium
                 LOGGER.info("Opening main video at " + MAIN_URL + ".");
-                driver.get(MAIN_URL);
-                waitFor(PAGE_LOAD_DELAY); 
+                try (LockWrapper wrapper = new LockWrapper(driverLock)) {
+                    wrapper.lock();
+                    driver.get(MAIN_URL);
+                }
+                waitFor(PAGE_LOAD_DELAY);
 
                 // Press 'space' to start the main video and wait for it to finish
                 LOGGER.info("Playing main video for " + MAIN_SECONDS + " seconds.");
-                body = driver.findElement(By.tagName("body"));
-                if (!spacePressed) {
-                    body.sendKeys(Keys.SPACE);
-                    spacePressed = true;
+                try (LockWrapper wrapper = new LockWrapper(driverLock)) {
+                    wrapper.lock();
+                    body = driver.findElement(By.tagName("body"));
+                    if (!spacePressed) {
+                        body.sendKeys(Keys.SPACE);
+                        spacePressed = true;
+                    }
                 }
                 waitFor(MAIN_SECONDS);
 
@@ -76,12 +122,19 @@ public class Main {
                 // Use Selenium to scrape search results from YouTube
                 // Only look for videos less than MAX_SECONDARY_MINUTES in duration
                 LOGGER.info("Searching for videos using query '" + query + "'.");
-                driver.get(SEARCH_URL + query);
+                try (LockWrapper wrapper = new LockWrapper(driverLock)) {
+                    wrapper.lock();
+                    driver.get(SEARCH_URL + query);
+                }
                 waitFor(PAGE_LOAD_DELAY);
-                Document document = Jsoup.parse(driver.getPageSource());
+                Document document;
+                try (LockWrapper wrapper = new LockWrapper(driverLock)) {
+                    wrapper.lock();
+                    document = Jsoup.parse(driver.getPageSource());
+                }
                 Elements elements = document.select("a[href]");
-                List<String> links = new ArrayList<>(); 
-                List<Integer> linkDurations= new ArrayList<>();
+                List<String> links = new ArrayList<>();
+                List<Integer> linkDurations = new ArrayList<>();
                 for (Element element : elements) {
                     String relLink = element.attr("href").toString();
                     String description = element.attr("aria-label").toString();
@@ -102,9 +155,15 @@ public class Main {
                 LOGGER.info("Playing " + numVideos + " short videos.");
                 for (int i = 0; i < numVideos; i++) {
                     int j = random.nextInt(links.size());
-                    driver.get(links.get(j));
+                    try (LockWrapper wrapper = new LockWrapper(driverLock)) {
+                        wrapper.lock();
+                        driver.get(links.get(j));
+                    }
                     waitFor(PAGE_LOAD_DELAY);
-                    body = driver.findElement(By.tagName("body"));
+                    try (LockWrapper wrapper = new LockWrapper(driverLock)) {
+                        wrapper.lock();
+                        body = driver.findElement(By.tagName("body"));
+                    }
                     waitFor(linkDurations.get(j));
                 }
             }
